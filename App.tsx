@@ -1,21 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
+import Home from './pages/home';
+import Campaign from './pages/campaign';
+import { createStore } from 'redux';
+import rootReducer from './store';
+import { persistStore } from 'redux-persist';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import styled from 'styled-components';
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!!</Text>
-      </View>
-    );
-  }
-}
+const navigator = createStackNavigator({ Home, Campaign }, {initialRouteName: 'Campaign'});
+const App = createAppContainer(navigator);
+const store = createStore(rootReducer);
+const persistor = persistStore(store);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default () => (
+  <Provider store={store}>
+    <PersistGate persistor={persistor}>
+        <App />
+    </PersistGate>
+  </Provider>
+)
