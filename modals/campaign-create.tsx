@@ -2,26 +2,62 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../store/actions';
-import { Modal } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Modal, DatePickerIOS, View } from 'react-native';
 import styled from 'styled-components';
-import { Container, Title } from '../common';
+import { Container, Title, Field, AppButton } from '../common';
 
 
 interface PropTypes {
     actions: Actions;
     show: boolean;
 }
-const CampaignCreate: React.SFC<PropTypes> = ({show, actions}) => (
-    <Modal visible={show} transparent={false} animationType='slide'>
-        <Container>
-            <Title>Create a new campaign</Title>
-            <Button title='Create' onPress={() => {
-                actions.toggleValue('showCampaignModal');
-            }} />
-        </Container>
-    </Modal>
-);
+export class CampaignCreate extends React.Component<PropTypes> {
+    state = { name: '', description: '', endDate: new Date()};
+    resetState = () => {
+        this.setState({ name: '', description: '' });
+    }
+    render() {
+        const {show, actions} = this.props;
+         return (
+            <Modal visible={show} transparent={false} animationType='slide'>
+                <Container>
+                    <InnerContainer>
+                        <Title>Create a new campaign</Title>
+                        <Field
+                            placeholder='Campaign name'
+                            onChangeText={ text => this.setState({ name: text })} />
+                        <Field
+                            placeholder='Description' 
+                            onChangeText={ text => this.setState({ description: text})} />
+                    </InnerContainer>
+                    <AppButton type='outline' title='Cancel' onPress={() => {
+                        this.resetState();
+                        actions.toggleValue('showCampaignModal');
+                    }} />
+                    <AppButton
+                        title='Create'
+                        disabled={!this.state.name.length || !this.state.description.length}
+                        onPress={() => {
+                            actions.campaignCreate({
+                                name: this.state.name,
+                                description: this.state.description
+                            });
+                            this.resetState();
+                            actions.toggleValue('showCampaignModal');
+                    }} />
+                </Container>
+            </Modal>
+        )
+    }
+}
+
+const InnerContainer = styled.View`
+    padding-top: 20px;
+    padding-bottom: 40px;
+    justify-content: center;
+    flex: 1;
+    align-items: center;
+`;
 const mapStateToProps = (state: Store) => ({
     show: state.showCampaignModal
 });

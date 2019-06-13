@@ -1,23 +1,35 @@
 import React from 'react';
 import { FlatList, Text } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { actions } from '../store/actions';
 import { bindActionCreators } from 'redux';
-import { Button } from 'react-native-elements';
+import { Button, ListItem } from 'react-native-elements';
 import { NavigationScreenProp } from 'react-navigation';
 import styled from 'styled-components';
-import { Container, Title } from '../common';
+import { Container, Title, AppButton } from '../common';
 import CampaignCreate from '../modals/campaign-create';
-
 
 interface PropTypes {
     actions: Actions;
     navigation: NavigationScreenProp<any, any>;
     campaigns: Campaign[];
+    currentCampaign: any;
 }
 export class CampaignComp extends React.Component<PropTypes> {
+    componentDidMount() {
+        const { currentCampaign, navigation } = this.props;
+        if (currentCampaign) {
+            navigation.navigate('Home');
+        }
+
+    }
     render() {
-        const { navigation, campaigns, actions } = this.props;
+        const {
+            navigation,
+            campaigns,
+            actions
+        } = this.props;
         return (
             <Container>
                 <Title>Choose a campaign</Title>
@@ -25,21 +37,23 @@ export class CampaignComp extends React.Component<PropTypes> {
                 <FlatList
                     data={campaigns}
                     keyExtractor={campaign => campaign.id}
-                    renderItem={({ item }) => <Text>{item.name}</Text>}
+                    renderItem={({ item }) => (
+                        <ListItem 
+                            title={item.name}
+                            onPress={() => {
+                                actions.campaignSetCurrent(item.id);
+                                navigation.navigate('Home');
+                            }}
+                            rightIcon={<Icon name='chevron-right' />} 
+                            titleStyle={{fontSize: 12}}
+                            />
+                    )}
                     ItemSeparatorComponent={Separator}
                     ListEmptyComponent={<Empty>No campaigns</Empty>}
                     />
-                <Button
-                    onPress={() => {
-                        !campaigns.length
-                        ? actions.toggleValue('showCampaignModal')
-                        : navigation.navigate('Home')
-                    }}
-                    title={
-                        !campaigns.length
-                        ? 'Create new'
-                        : 'Select'
-                    } />
+                <AppButton
+                    onPress={() => actions.toggleValue('showCampaignModal')}
+                    title='Create new'/>
             </Container>
         )
     }
@@ -55,9 +69,9 @@ const Separator = styled.View`
     width: 100%;
     background-color: #CED0CE;
 `;
-
 const mapStateToProps = (store: Store) => ({
-    campaigns: store.campaigns
+    campaigns: store.campaigns,
+    currentCampaign: store.currentCampaign
 })
 const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators(actions, dispatch)

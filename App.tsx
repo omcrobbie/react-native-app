@@ -8,7 +8,6 @@ import rootReducer from './store';
 import { persistStore } from 'redux-persist';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import styled from 'styled-components';
 
 const navigator = createStackNavigator({ Home, Campaign }, {initialRouteName: 'Campaign'});
 const App = createAppContainer(navigator);

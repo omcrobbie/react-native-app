@@ -1,5 +1,5 @@
 declare interface Store {
-    currentCampaign: string | null;
+    currentCampaign: Campaign | null;
     campaigns: Campaign[];
     showCampaignModal: boolean;
     showEntryModal: boolean;
@@ -8,17 +8,29 @@ declare interface Campaign {
     id: string;
     name: string;
     description: string;
-    entries: Entry[];
+    records: AppRecord[];
+    categories: Category[];
     startDate: string;
-    endDate: string;
+    endDate?: string;
+}
+declare interface Category {
+    label: string;
+    weight: number;
+    color: string;
+    id: string;
+}
+declare interface CategoryInput {
+    label: string;
+    weight?: number;
+    color: string;
 }
 declare interface CampaignInput {
     name: string;
     description?: string;
-    startDate: Date;
+    startDate?: Date;
     endDate?: Date;
 }
-declare interface Entry {
+declare interface AppRecord {
     label: string;
     weight: number;
     color: string;
@@ -31,11 +43,11 @@ declare interface EntryInput {
     color: string;
 }
 declare interface Actions {
-    campaignCreate(payload: CampaignInput);
-    campaignRemove(id: string);
-    campaignSetCurrent(id: string);
-    entryCreate(payload: EntryInput);
-    entryRemove(id: string);
-    toggleValue(stateKey: string);
+    campaignCreate(payload: CampaignInput): void;
+    campaignRemove(id: string): void;
+    campaignSetCurrent(id: string): void;
+    entryCreate(payload: EntryInput): void;
+    entryRemove(id: string): void;
+    toggleValue(stateKey: string): void;
 
 }
