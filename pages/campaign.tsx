@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux';
 import { Button, ListItem } from 'react-native-elements';
 import { NavigationScreenProp } from 'react-navigation';
 import styled from 'styled-components';
-import { Container, Title, AppButton } from '../common';
+import { Container, Title, AppButton, Separator, Empty } from '../common';
 import CampaignCreate from '../modals/campaign-create';
 
 interface PropTypes {
@@ -22,7 +22,6 @@ export class CampaignComp extends React.Component<PropTypes> {
         if (currentCampaign) {
             navigation.navigate('Home');
         }
-
     }
     render() {
         const {
@@ -58,22 +57,11 @@ export class CampaignComp extends React.Component<PropTypes> {
         )
     }
 }
-
-const Empty = styled.Text`
-    color: lightgray;
-    font-size: 12px;
-    align-self: center;
-`;
-const Separator = styled.View`
-    height: 1;
-    width: 100%;
-    background-color: #CED0CE;
-`;
 const mapStateToProps = (store: Store) => ({
     campaigns: store.campaigns,
     currentCampaign: store.currentCampaign
 })
 const mapDispatchToProps = dispatch => ({
-    actions: bindActionCreators(actions, dispatch)
+    actions: bindActionCreators<Actions, any>(actions, dispatch)
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CampaignComp);

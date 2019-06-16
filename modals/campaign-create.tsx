@@ -12,7 +12,7 @@ interface PropTypes {
     show: boolean;
 }
 export class CampaignCreate extends React.Component<PropTypes> {
-    state = { name: '', description: '', endDate: new Date()};
+    state = { name: '', description: '' };
     resetState = () => {
         this.setState({ name: '', description: '' });
     }
@@ -38,10 +38,7 @@ export class CampaignCreate extends React.Component<PropTypes> {
                         title='Create'
                         disabled={!this.state.name.length || !this.state.description.length}
                         onPress={() => {
-                            actions.campaignCreate({
-                                name: this.state.name,
-                                description: this.state.description
-                            });
+                            actions.campaignCreate(this.state);
                             this.resetState();
                             actions.toggleValue('showCampaignModal');
                     }} />
@@ -62,6 +59,6 @@ const mapStateToProps = (state: Store) => ({
     show: state.showCampaignModal
 });
 const mapDispatchToProps = dispatch => ({
-    actions: bindActionCreators(actions, dispatch)
+    actions: bindActionCreators<Actions, any>(actions, dispatch)
 });
 export default connect(mapStateToProps, mapDispatchToProps)(CampaignCreate);

@@ -1,12 +1,13 @@
 import { types } from "./actions";
 import { AsyncStorage } from 'react-native';
 import { persistReducer } from 'redux-persist';
-const uuid = require('uuid/v1');
+import * as handle from './handlers';
 
 const initialState: Store = {
     currentCampaign: null,
     campaigns: [],
     showCampaignModal: false,
+    showCategoryModal: false,
     showEntryModal: false
 };
 
@@ -15,27 +16,27 @@ const reducer = (state = initialState, {type, payload}) => {
         case types.TOGGLE_VALUE:
             return {...state, [payload]: !state[payload]};
         case types.CAMPAIGN_CREATE:
-            const campaign: Campaign = {
-                name: payload.name,
-                description: payload.description,
-                id: uuid(),
-                startDate: new Date().toISOString(),
-                records: [],
-                categories: []
-            };
             return {
                 ...state,
-                campaigns: [campaign, ...state.campaigns]
+                campaigns: [handle.createCampaign(payload), ...state.campaigns]
             };
         case types.CAMPAIGN_SET_CURRENT:
-            const currentCampaign = state.campaigns.find(c => c.id === payload);
-            return {...state, currentCampaign}
+            return {
+                ...state,
+                currentCampaign: handle.setCurrentCampaign(state, payload)
+            }
         case types.CAMPAIGN_REMOVE:
             return {
                 ...state,
-                currentCampaign: '',
+                currentCampaign: null,
                 campaigns: state.campaigns.filter(c => c.id !== payload)
             };
+        case types.CATEGORY_CREATE:
+                return {
+                    ...state,
+                    currentCampaign: handle.createCategory(state, payload),
+                    campaigns: handle.refreshCampaigns(state)
+                };
         default:
             return state;
     }

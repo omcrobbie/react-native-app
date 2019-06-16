@@ -16,6 +16,16 @@ export const Title = styled.Text`
     margin-bottom: 15px;
     align-self: center;
 `;
+export const Empty = styled.Text`
+    color: lightgray;
+    font-size: 12px;
+    align-self: center;
+`;
+export const Separator = styled.View`
+    height: 1;
+    width: 100%;
+    background-color: #CED0CE;
+`;
 export const Field = styled(Input).attrs({
     containerStyle: {
         borderColor: 'lightgrey',
