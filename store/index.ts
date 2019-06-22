@@ -4,7 +4,7 @@ import { persistReducer } from 'redux-persist';
 import * as handle from './handlers';
 
 const initialState: Store = {
-    currentCampaign: null,
+    currentCampaignId: '',
     campaigns: [],
     showCampaignModal: false,
     showCategoryModal: false,
@@ -23,20 +23,26 @@ const reducer = (state = initialState, {type, payload}) => {
         case types.CAMPAIGN_SET_CURRENT:
             return {
                 ...state,
-                currentCampaign: handle.setCurrentCampaign(state, payload)
+                currentCampaign: payload
             }
         case types.CAMPAIGN_REMOVE:
             return {
                 ...state,
-                currentCampaign: null,
+                currentCampaign: '',
                 campaigns: state.campaigns.filter(c => c.id !== payload)
             };
         case types.CATEGORY_CREATE:
+                handle.createCategory(state, payload);
                 return {
                     ...state,
-                    currentCampaign: handle.createCategory(state, payload),
-                    campaigns: handle.refreshCampaigns(state)
+                    campaigns: state.campaigns.slice(0)
                 };
+        case types.CATEGORY_REMOVE:
+            handle.removeCategory(state, payload);
+            return {
+                ...state,
+                campaigns: state.campaigns.slice(0)
+            }
         default:
             return state;
     }

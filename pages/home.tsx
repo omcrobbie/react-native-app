@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, FlatList } from 'react-native';
+import { Alert, FlatList, Text } from 'react-native';
 import { connect } from 'react-redux';
 import { Title, Container, AppButton, Separator, Empty } from '../common';
 import { NavigationScreenProp } from 'react-navigation';
@@ -8,6 +8,7 @@ import { bindActionCreators } from 'redux';
 import { actions } from '../store/actions';
 import CategoryCreate from '../modals/category-create';
 import { ListItem } from 'react-native-elements';
+import { getCurrentCampaign } from '../store/selectors';
 
 interface PropTypes {
     currentCampaign: Campaign;
@@ -28,10 +29,8 @@ export class Home extends React.Component<PropTypes> {
         } = this.props;
         return (
             <Container>
-                <InnerContainer>
-                    <Title>{currentCampaign.name}</Title>
-                    <Subtitle>Day {currentCampaign.days}</Subtitle>
-                </InnerContainer>
+                <Title>{currentCampaign.name}</Title>
+                <Subtitle>Day {currentCampaign.days}, {records.length} records</Subtitle>
                 <CategoryCreate />
                 <FlatList
                     data={categories}
@@ -41,7 +40,11 @@ export class Home extends React.Component<PropTypes> {
                             title={item.label}
                             titleStyle={{fontSize: 12}}
                             leftElement={<Swatch color={item.color} />}
-                            />
+                            rightElement={
+                                <Text 
+                                    onPress={() => actions.categoryRemove(item.id)}>X
+                                </Text>
+                                }/>
                     )}
                     ItemSeparatorComponent={Separator}
                     ListEmptyComponent={<Empty>No categories</Empty>}
@@ -93,11 +96,14 @@ const Swatch = styled.View`
     background-color: ${({ color }) => color };
     border-color: lightgray;
 `;
-const mapStateToProps = (state: Store) => ({
-    currentCampaign: state.currentCampaign || {},
-    categories: state.currentCampaign ? state.currentCampaign.categories : [],
-    records: state.currentCampaign ? state.currentCampaign.records : []
-});
+const mapStateToProps = (state: Store) => {
+    const currentCampaign: Partial<Campaign> = getCurrentCampaign(state);
+    return {
+        currentCampaign,
+        categories: state.currentCampaignId ? currentCampaign.categories : [],
+        records: state.currentCampaignId ? currentCampaign.records : []
+    }
+};
 const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators<Actions, any>(actions, dispatch)
 });

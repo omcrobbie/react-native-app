@@ -1,5 +1,5 @@
 declare interface Store {
-    currentCampaign: Campaign | null;
+    currentCampaignId: string;
     campaigns: Campaign[];
     showCampaignModal: boolean;
     showEntryModal: boolean;
@@ -46,6 +46,7 @@ declare interface Actions {
     campaignRemove(id: string): void;
     campaignSetCurrent(id: string): void;
     categoryCreate(payload: CategoryInput): void;
+    categoryRemove(payload: string): void;
     recordCreate(payload: AppRecordInput): void;
     toggleValue(stateKey: string): void;
 

@@ -11,7 +11,7 @@ export const Container = styled.View`
     height: 100%;
 `;
 export const Title = styled.Text`
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 400;
     margin-bottom: 15px;
     align-self: center;
@@ -20,6 +20,7 @@ export const Empty = styled.Text`
     color: lightgray;
     font-size: 12px;
     align-self: center;
+    margin-top: 20px;
 `;
 export const Separator = styled.View`
     height: 1;

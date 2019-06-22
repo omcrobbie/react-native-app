@@ -9,17 +9,18 @@ import { NavigationScreenProp } from 'react-navigation';
 import styled from 'styled-components';
 import { Container, Title, AppButton, Separator, Empty } from '../common';
 import CampaignCreate from '../modals/campaign-create';
+import { getCurrentCampaign } from '../store/selectors';
 
 interface PropTypes {
     actions: Actions;
     navigation: NavigationScreenProp<any, any>;
     campaigns: Campaign[];
-    currentCampaign: any;
+    currentCampaign: Campaign;
 }
 export class CampaignComp extends React.Component<PropTypes> {
     componentDidMount() {
         const { currentCampaign, navigation } = this.props;
-        if (currentCampaign) {
+        if (currentCampaign.id) {
             navigation.navigate('Home');
         }
     }
@@ -44,7 +45,8 @@ export class CampaignComp extends React.Component<PropTypes> {
                                 navigation.navigate('Home');
                             }}
                             rightIcon={<Icon name='chevron-right' />} 
-                            titleStyle={{fontSize: 12}}
+                            subtitle={item.description}
+                            subtitleStyle={{color: 'lightgrey'}}
                             />
                     )}
                     ItemSeparatorComponent={Separator}
@@ -59,9 +61,9 @@ export class CampaignComp extends React.Component<PropTypes> {
 }
 const mapStateToProps = (store: Store) => ({
     campaigns: store.campaigns,
-    currentCampaign: store.currentCampaign
+    currentCampaign: getCurrentCampaign(store)
 })
 const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators<Actions, any>(actions, dispatch)
 });
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignComp);
+export default connect(mapStateToProps, mapDispatchToProps)(CampaignComp as any);

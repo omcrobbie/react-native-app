@@ -13,5 +13,6 @@ export const actions: Actions = {
     campaignSetCurrent: (id) => ({type: types.CAMPAIGN_SET_CURRENT, payload: id}),
     recordCreate: (payload) => ({type: types.RECORD_CREATE, payload}),
     toggleValue: (stateKey) => ({type: types.TOGGLE_VALUE, payload: stateKey}),
-    categoryCreate: (payload) => ({type: types.CATEGORY_CREATE, payload})
+    categoryCreate: (payload) => ({type: types.CATEGORY_CREATE, payload}),
+    categoryRemove: (payload) => ({type: types.CATEGORY_REMOVE, payload})
 }

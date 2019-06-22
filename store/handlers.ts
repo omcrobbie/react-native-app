@@ -13,34 +13,17 @@ export function createCampaign(payload: CampaignInput): Campaign {
         categories: []
     };
 }
-export function setCurrentCampaign(state: Store, campaignId: string): Campaign {
-    const currentCampaign = findCampaign(state, campaignId);
-    return {
-        ...currentCampaign,
-        days: setDays(currentCampaign)
-    }
-}
-export function createCategory(state: Store, {color, label}: CategoryInput): Campaign {
-    const id = state.currentCampaign!.id;
-    const campaign = findCampaign(state, id);
+export function createCategory(state: Store, {color, label}: CategoryInput) {
+    const campaign = findCampaign(state, state.currentCampaignId);
     const category: Category = {
         color,
         label,
         id: uuid()
     };
     campaign.categories.push(category);
-    return {
-        ...campaign,
-        days: setDays(campaign)
-    };
 }
-export function refreshCampaigns(state: Store): Campaign[] {
-    const others = state.campaigns.filter(c => c.id !== state.currentCampaign!.id);
-    return [
-        state.currentCampaign!, ...others
-    ];
-}
-export function setDays(campaign: Campaign) {
-    const startDate = parse(campaign.startDate);
-    return differenceInDays(new Date(), startDate) + 1;
+export function removeCategory(state: Store, categoryId: string) {
+    const campaign = findCampaign(state, state.currentCampaignId)!;
+    const idx = campaign.categories.indexOf(campaign.categories.find(c => c.id === categoryId)!);
+    campaign.categories.splice(idx, 1);
 }
