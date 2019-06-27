@@ -1,58 +1,31 @@
-import { types } from "./actions";
-import { AsyncStorage } from 'react-native';
-import { persistReducer } from 'redux-persist';
-import * as handle from './handlers';
+import { types, Instance } from 'mobx-state-tree';
+import { Campaign, ICampaignIn } from './campaign';
 
-const initialState: Store = {
-    currentCampaignId: '',
-    campaigns: [],
-    showCampaignModal: false,
-    showCategoryModal: false,
-    showEntryModal: false
-};
-
-const reducer = (state = initialState, {type, payload}) => {
-    switch(type) {
-        case types.TOGGLE_VALUE:
-            return {...state, [payload]: !state[payload]};
-        case types.CAMPAIGN_CREATE:
-            return {
-                ...state,
-                campaigns: [handle.createCampaign(payload), ...state.campaigns]
-            };
-        case types.CAMPAIGN_SET_CURRENT:
-            return {
-                ...state,
-                currentCampaign: payload
-            }
-        case types.CAMPAIGN_REMOVE:
-            return {
-                ...state,
-                currentCampaign: '',
-                campaigns: state.campaigns.filter(c => c.id !== payload)
-            };
-        case types.CATEGORY_CREATE:
-                handle.createCategory(state, payload);
-                return {
-                    ...state,
-                    campaigns: state.campaigns.slice(0)
-                };
-        case types.CATEGORY_REMOVE:
-            handle.removeCategory(state, payload);
-            return {
-                ...state,
-                campaigns: state.campaigns.slice(0)
-            }
-        default:
-            return state;
-    }
-}
-const persistConfig = {
-    key: 'root',
-    storage: AsyncStorage,
-    blacklist: [
-        'showCampaignModal',
-        'showEntryModal'
-    ]
-}
-export default persistReducer(persistConfig, reducer as any);
+export const Store = types.model('Root', {
+        campaigns: types.array(Campaign),
+        currentCampaignId: types.maybeNull(types.string),
+        showCampaignModal: false,
+        showCategoryModal: false
+    })
+    .views(self => ({
+        get currentCampaign() {
+            return self.campaigns.find(c => c.id === self.currentCampaignId);
+        }
+    }))
+    .actions(self => ({
+        setCurrentCampaignId(id) {
+            self.currentCampaignId = id;
+        },
+        createCampaign(campaignData: ICampaignIn) {
+            self.campaigns.push(Campaign.create(campaignData));
+        },
+        removeCampaign(id) {
+            const current = self.campaigns.find(c => c.id === id);
+            self.campaigns.remove(current!);
+            self.currentCampaignId = null;
+        },
+        toggleValue(val: 'showCampaignModal' | 'showCategoryModal') {
+            self[val] = !self[val];
+        }
+    }))
+export interface IStore extends Instance<typeof Store> {}

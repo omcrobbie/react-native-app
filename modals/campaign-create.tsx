@@ -1,23 +1,28 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { actions } from '../store/actions';
-import { Modal, DatePickerIOS, View } from 'react-native';
+
+import { Modal } from 'react-native';
 import styled from 'styled-components';
 import { Container, Title, Field, AppButton } from '../common';
+import { observer, inject } from 'mobx-react';
+import { IStore } from '../store';
 
 
 interface PropTypes {
-    actions: Actions;
+    store: IStore;
     show: boolean;
 }
-export class CampaignCreate extends React.Component<PropTypes> {
+@observer
+@inject((store: IStore) => ({
+    store,
+    show: store.showCampaignModal
+}))
+export default class CampaignCreate extends React.Component<Partial<PropTypes>> {
     state = { name: '', description: '' };
     resetState = () => {
         this.setState({ name: '', description: '' });
     }
     render() {
-        const {show, actions} = this.props;
+        const {show, store} = this.props;
          return (
             <Modal visible={show} transparent={false} animationType='slide'>
                 <Container>
@@ -32,15 +37,15 @@ export class CampaignCreate extends React.Component<PropTypes> {
                     </InnerContainer>
                     <AppButton type='outline' title='Cancel' onPress={() => {
                         this.resetState();
-                        actions.toggleValue('showCampaignModal');
+                        store.toggleValue('showCampaignModal');
                     }} />
                     <AppButton
                         title='Create'
                         disabled={!this.state.name.length || !this.state.description.length}
                         onPress={() => {
-                            actions.campaignCreate(this.state);
+                            store.createCampaign(this.state);
                             this.resetState();
-                            actions.toggleValue('showCampaignModal');
+                            store.toggleValue('showCampaignModal');
                     }} />
                 </Container>
             </Modal>
@@ -55,10 +60,10 @@ const InnerContainer = styled.View`
     flex: 1;
     align-items: center;
 `;
-const mapStateToProps = (state: Store) => ({
-    show: state.showCampaignModal
-});
-const mapDispatchToProps = dispatch => ({
-    actions: bindActionCreators<Actions, any>(actions, dispatch)
-});
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignCreate);
+// const mapStateToProps = (state: Store) => ({
+//     show: state.showCampaignModal
+// });
+// const mapDispatchToProps = dispatch => ({
+//     actions: bindActionCreators<Actions, any>(actions, dispatch)
+// });
+// export default connect(mapStateToProps, mapDispatchToProps)(CampaignCreate);

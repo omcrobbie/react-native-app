@@ -1,23 +1,27 @@
 import React from 'react';
-import { FlatList, Text } from 'react-native';
+import { FlatList } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { connect } from 'react-redux';
-import { actions } from '../store/actions';
-import { bindActionCreators } from 'redux';
-import { Button, ListItem } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
 import { NavigationScreenProp } from 'react-navigation';
-import styled from 'styled-components';
 import { Container, Title, AppButton, Separator, Empty } from '../common';
 import CampaignCreate from '../modals/campaign-create';
-import { getCurrentCampaign } from '../store/selectors';
+import { observer, inject } from 'mobx-react';
+import { IStore } from '../store';
+import { ICampaign } from '../store/campaign';
 
-interface PropTypes {
-    actions: Actions;
+type PropTypes = {
     navigation: NavigationScreenProp<any, any>;
-    campaigns: Campaign[];
-    currentCampaign: Campaign;
+    campaigns: ICampaign[];
+    currentCampaign: ICampaign;
+    store: IStore;
 }
-export class CampaignComp extends React.Component<PropTypes> {
+@observer
+@inject((store: IStore) => ({
+    store,
+    campaigns: store.campaigns,
+    currentCampaign: store.currentCampaign
+}))
+export default class CampaignComp extends React.Component<PropTypes> {
     componentDidMount() {
         const { currentCampaign, navigation } = this.props;
         if (currentCampaign.id) {
@@ -28,7 +32,7 @@ export class CampaignComp extends React.Component<PropTypes> {
         const {
             navigation,
             campaigns,
-            actions
+            store
         } = this.props;
         return (
             <Container>
@@ -41,7 +45,7 @@ export class CampaignComp extends React.Component<PropTypes> {
                         <ListItem 
                             title={item.name}
                             onPress={() => {
-                                actions.campaignSetCurrent(item.id);
+                                store.setCurrentCampaignId(item.id)
                                 navigation.navigate('Home');
                             }}
                             rightIcon={<Icon name='chevron-right' />} 
@@ -53,17 +57,18 @@ export class CampaignComp extends React.Component<PropTypes> {
                     ListEmptyComponent={<Empty>No campaigns</Empty>}
                     />
                 <AppButton
-                    onPress={() => actions.toggleValue('showCampaignModal')}
+                    onPress={() => store.toggleValue('showCampaignModal')}
                     title='Create new'/>
             </Container>
         )
     }
 }
-const mapStateToProps = (store: Store) => ({
-    campaigns: store.campaigns,
-    currentCampaign: getCurrentCampaign(store)
-})
-const mapDispatchToProps = dispatch => ({
-    actions: bindActionCreators<Actions, any>(actions, dispatch)
-});
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignComp as any);
+
+// const mapStateToProps = (store: Store) => ({
+//     campaigns: store.campaigns,
+//     currentCampaign: getCurrentCampaign(store)
+// })
+// const mapDispatchToProps = dispatch => ({
+//     actions: bindActionCreators<Actions, any>(actions, dispatch)
+// });
+// export default connect(mapStateToProps, mapDispatchToProps)(CampaignComp as any);
